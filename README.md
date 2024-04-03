@@ -88,24 +88,24 @@ the journey towards stronger software security.
 The SBOM found in this project was generated using [cyclonedx-gomod](https://github.com/CycloneDX/cyclonedx-gomod).
 The exact commands used can be found below.
 
-```bash
+```console
 cyclonedx-gomod mod -std -json -output bom.json  ./
 ```
 
-Generates an SBOM in json format, includes the aggregate of modules
+Generates an SBOM in JSON format, includes the aggregate of modules
 required by all packages in the target module. This optionally
-includes modules required by tests and test packages. Build
-constraints are NOT evaluated, allowing for a "whole picture"
+includes modules required by tests and test packages. **Build
+constraints are not evaluated**, allowing for a "whole picture"
 view on the target module's dependencies.
 
-```bash
+```console
 cyclonedx-gomod app -std -json -output sbom.json  ./
 ```
 
-Generates an SBOM in json format for only the
+Generates an SBOM in JSON format for only the
 modules the target application depends on. Modules required by tests
 or packages that are not imported by the application are not included.
-Build constraints are evaluated, which enables a very detailed view of
+**Build constraints are evaluated**, which enables a very detailed view of
 what's really compiled into an application's binary.
 
 This project does not inlude executables but if that changes in the future
