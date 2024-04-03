@@ -14,7 +14,7 @@ appropriate for a Go package.
 To install the example package, use `go build`:
 
 ```console
-go build --ldflags "-X 'main.version=$(git describe --tag --abbrev=0)'"  -o skeleton-golang-package-$(git describe --tag --abbrev=0)
+go build -ldflags "-X 'main.version=$(git describe --tag --abbrev=0)'" -o skeleton-golang-package-$(git describe --tag --abbrev=0)
 ```
 
 This will produce an executable `skeleton-golang-package-v*` with an appended
