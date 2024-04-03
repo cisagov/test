@@ -213,12 +213,12 @@ jobs:
         uses: actions/setup-go@v4
         with:
           go-version: ${{ matrix.go-version }}
-      - name: Lookup Go cache directory
-        id: go-cache
+      - id: go-cache
+        name: Lookup Go cache directory
         run: |
           echo "dir=$(go env GOCACHE)" >> $GITHUB_OUTPUT
-      - name: Lookup Go module cache directory
-        id: go-modcache
+      - id: go-modcache
+        name: Lookup Go module cache directory
         run: |
           echo "dir=$(go env GOMODCACHE)" >> $GITHUB_OUTPUT
       - uses: actions/cache@v3
@@ -226,11 +226,11 @@ jobs:
           BASE_CACHE_KEY: "${{ github.job }}-${{ runner.os }}-\
             go${{ steps.setup-go.outputs.go-version }}-"
         with:
+          key: "${{ env.BASE_CACHE_KEY }}\
+            ${{ hashFiles('**/go.sum') }}"
           path: |
             ${{ steps.go-cache.outputs.dir }}
             ${{ steps.go-modcache.outputs.dir }}
-          key: "${{ env.BASE_CACHE_KEY }}\
-            ${{ hashFiles('**/go.sum') }}"
           restore-keys: |
             ${{ env.BASE_CACHE_KEY }}
       - name: Install go-junit-report
@@ -244,18 +244,15 @@ jobs:
           PACKAGE_VERSION: ${{ steps.setup-env.outputs.gomock-version }}
         run: go install ${PACKAGE_URL}@${PACKAGE_VERSION}
       - name: Build package
-        run: |
-          export GOPATH="$HOME/go/"
-          export PATH=$PATH:$GOPATH/bin
-          go build -v ./...
+        run: go build -v ./...
       - name: Generate mocks and run tests
         run: |
           go generate ./
-          go test -v ./test/* | go-junit-report -set-exit-code > report.xml
-      - name: Test summary
+          go test -v 2>&1 ./test/* | go-junit-report -set-exit-code -out report.xml
+      # If previous steps fail, we still want to always update build status
+      # since it will be affected.
+      - if: always()
+        name: Test summary
         uses: test-summary/action@v2
         with:
           paths: report.xml
-        # If previous steps fail, we still want to always update build status
-        # since it will be affected.
-        if: always()
